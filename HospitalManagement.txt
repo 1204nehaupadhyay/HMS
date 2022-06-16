@@ -1,0 +1,1248 @@
+---********************Drop Tables*******************
+drop table MESSAGE cascade constraints;
+drop table PRESCRIPTION cascade constraints;
+drop table ALLERGY cascade constraints; 
+drop table M_DRUG cascade constraints; 
+drop table PATIENT_TREATMENTDETAILS cascade constraints;
+drop table ADMIT_ROOM cascade constraints; 
+drop table ADMISSION cascade constraints; 
+drop table PATIENT cascade constraints;
+drop table SHIFT_ROOMS cascade constraints; 
+drop table SHIFT cascade constraints; 
+drop table TREATMENT cascade constraints;
+drop table ROOM cascade constraints; 
+drop table M_NURSE cascade constraints;
+drop table DOCTOR_HOSPITAL cascade constraints;
+drop table M_DOCTOR cascade constraints; 
+drop table M_HOSPITAL cascade constraints;
+
+---******CREATE TABLES******
+CREATE TABLE M_HOSPITAL(
+HID int,
+NAME varchar(50),
+ADDRESS varchar(200),
+PRIMARY KEY(HID));
+
+CREATE TABLE M_DOCTOR(
+DID INT,
+NAME VARCHAR(50),
+ADDRESS VARCHAR(200),
+PRIMARY KEY (DID));
+
+CREATE TABLE DOCTOR_HOSPITAL(
+DID INT,
+HID INT,
+PRIMARY KEY (DID,HID),
+FOREIGN KEY(DID) REFERENCES M_DOCTOR,
+FOREIGN KEY(HID) REFERENCES M_HOSPITAL
+);
+
+CREATE TABLE M_NURSE(
+NID INT,
+NAME VARCHAR(50),
+HID INT,
+PRIMARY KEY (NID),
+FOREIGN KEY(HID) REFERENCES M_HOSPITAL
+);
+
+CREATE TABLE ROOM(
+RID INT,
+HID INT,
+LOCATION VARCHAR(200),
+ROOMTYPE VARCHAR(50),
+PRIMARY KEY (RID),
+FOREIGN KEY(HID) REFERENCES M_HOSPITAL
+);
+
+CREATE TABLE TREATMENT(
+TID INT,
+DESCRIPTION VARCHAR(500),
+PRIMARY KEY (TID)
+); 
+ 
+CREATE TABLE SHIFT(
+SID INT,
+NID INT,
+RID INT,
+START_TIME TIMESTAMP,
+END_TIME TIMESTAMP,
+PRIMARY KEY (SID),
+FOREIGN KEY(NID) REFERENCES M_NURSE,
+FOREIGN KEY(RID) REFERENCES ROOM
+);
+ 
+CREATE TABLE SHIFT_ROOMS(
+SID INT,
+RID INT,
+PRIMARY KEY (SID, RID),
+FOREIGN KEY(SID) REFERENCES SHIFT,
+FOREIGN KEY(RID) REFERENCES ROOM
+);
+
+CREATE TABLE PATIENT(
+PID INT,
+PNAME VARCHAR(50),
+GENDER VARCHAR(10),
+DOB DATE,
+ADDRESS VARCHAR(200),
+PHONE CHAR(10),
+EMAIL VARCHAR(50),
+PRIMARY KEY (PID)
+);
+ 
+CREATE TABLE ADMISSION(
+AID INT,
+PID INT,
+HID INT,
+DID INT,
+ADMIT_DATE DATE,
+DISCHARGE_DATE DATE,
+REASON VARCHAR(500),
+NOTES VARCHAR(500),
+STATUS INT,
+PRIMARY KEY (AID),
+FOREIGN KEY(PID) REFERENCES PATIENT,
+FOREIGN KEY(HID) REFERENCES M_HOSPITAL,
+FOREIGN KEY(DID) REFERENCES M_DOCTOR
+);
+
+CREATE TABLE ADMIT_ROOM(
+AID INT,
+HID INT,
+RID INT,
+ROOM_STARTDATE TIMESTAMP,
+ROOM_ENDDATE TIMESTAMP,
+PRIMARY KEY (AID, RID, ROOM_STARTDATE),
+FOREIGN KEY(AID) REFERENCES ADMISSION,
+FOREIGN KEY(RID) REFERENCES ROOM
+);
+
+CREATE TABLE PATIENT_TREATMENTDETAILS(
+TID INT,
+AID INT,
+TREATMENT_DATE DATE,
+PRIMARY KEY(TID, TREATMENT_DATE),
+FOREIGN KEY(TID) REFERENCES TREATMENT,
+FOREIGN KEY(AID) REFERENCES ADMISSION
+);
+
+CREATE TABLE M_DRUG(
+DRID INT,
+DNAME VARCHAR(100),
+DOSE_VALUE VARCHAR(50),
+DOSE_PER_DAY INT,
+PRIMARY KEY (DRID)
+);
+
+CREATE TABLE ALLERGY(
+PID INT,
+DRID INT,
+PRIMARY KEY (PID, DRID),
+FOREIGN KEY(PID) REFERENCES PATIENT,
+FOREIGN KEY(DRID) REFERENCES M_DRUG
+);
+
+CREATE TABLE PRESCRIPTION(
+PRID INT,
+DRID INT,
+AID INT,
+PRESCRIPTION_DATE DATE,
+NO_OF_DAYS INT,
+NO_OF_REFILLS INT,
+PRIMARY KEY (PRID),
+FOREIGN KEY(DRID) REFERENCES M_DRUG,
+FOREIGN KEY(AID) REFERENCES ADMISSION
+);
+
+CREATE TABLE MESSAGE(
+MID INT,
+DID INT,
+PID INT,
+MESSAGE_TIME TIMESTAMP,
+MESSAGE VARCHAR(500),
+PRIMARY KEY (MID),
+FOREIGN KEY(DID) REFERENCES M_DOCTOR,
+FOREIGN KEY(PID) REFERENCES PATIENT
+);
+
+---*********INSERT STATEMENTS************
+
+INSERT INTO M_HOSPITAL VALUES(01, 'ALPHA CARE', '4526 WEST STREET,MICHIGAN,49503');
+INSERT INTO M_HOSPITAL VALUES(02, 'PIVOT PILOTS', '4215 SUGAR CAMP ROAD,MINNESOTA,56001');
+INSERT INTO M_HOSPITAL VALUES(03, 'CITY HOSPITAL', '4812 LITTLE STREET,OHIO,44311');
+INSERT INTO M_HOSPITAL VALUES(04, 'VISTA CARE', '1443 CESSNA DRIVE,INDIANA,46750');
+INSERT INTO M_HOSPITAL VALUES(05, 'NEW PATH', ' 921 ARCHWOOD AVENUE,WYOMING,82701');
+
+INSERT INTO M_DOCTOR VALUES(1000, 'ANGIE WEAVER', '2109 HOG CAMP ROAD,MICHIGAN,49503');
+INSERT INTO M_DOCTOR VALUES(1001, 'JIM SHAW', '3439 REEVES STREET,INDIANA,46750');
+INSERT INTO M_DOCTOR VALUES(1002, 'RAUL PAGE', '421 MEADOWVIEW DRIVE,MICHIGAN,49503');
+INSERT INTO M_DOCTOR VALUES(1003, 'SUZANNE RODRIQUEZ', '40 GAMBLER LANE,INDIANA,46750');
+INSERT INTO M_DOCTOR VALUES(1004, 'JANIE FOSTER', '2364 MOUNT TABOR,MINNESOTA,56001');
+
+INSERT INTO DOCTOR_HOSPITAL VALUES (1000,01);
+INSERT INTO DOCTOR_HOSPITAL VALUES (1000,02);
+INSERT INTO DOCTOR_HOSPITAL VALUES (1001,03);
+INSERT INTO DOCTOR_HOSPITAL VALUES (1002,04);
+INSERT INTO DOCTOR_HOSPITAL VALUES (1003,05);
+INSERT INTO DOCTOR_HOSPITAL VALUES (1004,05);
+
+INSERT INTO M_NURSE VALUES(2000, 'STEVE BRYANT', 01);
+INSERT INTO M_NURSE VALUES(2001, 'PHILIP PENA', 02);
+INSERT INTO M_NURSE VALUES(2002, 'MITCHELL WOOD', 01);
+INSERT INTO M_NURSE VALUES(2003, 'MARVIN NUNEZ', 02);
+INSERT INTO M_NURSE VALUES(2004, 'VERNON ROWE', 03);
+INSERT INTO M_NURSE VALUES(2005, 'SALLY OWEN', 05);
+INSERT INTO M_NURSE VALUES(2006, 'VERNA ORTEGA', 05);
+INSERT INTO M_NURSE VALUES(2007, 'SANDRA ESTRADA', 04);
+
+INSERT INTO ROOM VALUES(3000, 01, 'BUILDING A, ROOM 1A', 'REGULAR');
+INSERT INTO ROOM VALUES(3001, 01, 'BUILDING A, ROOM 1B', 'ICU');
+INSERT INTO ROOM VALUES(3002, 01, 'BUILDING A, ROOM 1C', 'OPERATING ROOM');
+INSERT INTO ROOM VALUES(3003, 02, 'BUILDING B, ROOM 2B', 'OPERATING ROOM');
+INSERT INTO ROOM VALUES(3004, 02, 'BUILDING B, ROOM 2C', 'REGULAR');
+INSERT INTO ROOM VALUES(3005, 02, 'BUILDING B, ROOM 2D', 'ICU');
+INSERT INTO ROOM VALUES(3006, 03, 'BUILDING K, ROOM 3K', 'REGULAR');
+INSERT INTO ROOM VALUES(3007, 04, 'BUILDING K, ROOM 3L', 'OPERATING ROOM');
+INSERT INTO ROOM VALUES(3008, 05, 'BUILDING K, ROOM 3M', 'ICU');
+INSERT INTO ROOM VALUES(3009, 05, 'BUILDING L, ROOM 4N' , 'REGULAR');
+INSERT INTO ROOM VALUES(3010, 05, 'BUILDING L, ROOM 4O' , 'ICU');
+
+INSERT INTO TREATMENT VALUES(4000, 'VIRAL FEVER');
+INSERT INTO TREATMENT VALUES(4001, 'FRACTURE AND HAIRLINE CRACK');
+INSERT INTO TREATMENT VALUES(4002, 'FULL BODY ANESTHESIA');
+INSERT INTO TREATMENT VALUES(4003, 'BLOOD TEST AND ENDOSCOPY');
+INSERT INTO TREATMENT VALUES(4004, 'SURGERY OF HEART AND BIOPSY REPORT');
+
+INSERT INTO SHIFT VALUES(5000, 2000, 3000, TIMESTAMP '2021-01-01 08:00:00', TIMESTAMP'2021-01-01 21:00:00');
+INSERT INTO SHIFT VALUES(5001, 2004, 3007, TIMESTAMP '2021-02-10 08:00:00', TIMESTAMP'2021-02-10 20:00:00');
+INSERT INTO SHIFT VALUES(5007, 2004, 3007, TIMESTAMP '2021-02-12 10:00:00', TIMESTAMP'2021-02-12 19:00:00');
+INSERT INTO SHIFT VALUES(5008, 2004, 3007, TIMESTAMP '2021-02-15 08:00:00', TIMESTAMP '2021-02-15 19:00:00');
+INSERT INTO SHIFT VALUES(5009, 2004, 3007, TIMESTAMP '2021-02-18 08:00:00', TIMESTAMP '2021-02-18 18:00:00');
+INSERT INTO SHIFT VALUES(5010, 2004, 3007, TIMESTAMP '2021-02-20 09:00:00', TIMESTAMP '2021-02-20 18:00:00');
+INSERT INTO SHIFT VALUES(5011, 2004, 3007, TIMESTAMP '2021-02-23 08:00:00', TIMESTAMP '2021-02-23 15:00:00');
+INSERT INTO SHIFT VALUES(5012, 2004, 3007, TIMESTAMP '2021-02-24 08:00:00', TIMESTAMP '2021-02-24 16:00:00');
+INSERT INTO SHIFT VALUES(5002, 2005, 3009, TIMESTAMP '2021-03-01 11:00:00', TIMESTAMP '2021-03-01 17:30:00');
+INSERT INTO SHIFT VALUES(5003, 2006, 3009, TIMESTAMP '2021-04-04 09:00:00', TIMESTAMP '2021-04-04 20:00:00');
+INSERT INTO SHIFT VALUES(5004, 2007, 3008, TIMESTAMP '2021-05-11 08:30:00', TIMESTAMP '2021-05-11 21:30:00');
+INSERT INTO SHIFT VALUES(5005, 2005, 3010, TIMESTAMP '2021-05-11 10:00:00', TIMESTAMP '2021-05-11 18:00:00');
+INSERT INTO SHIFT VALUES(5006, 2002, 3002, TIMESTAMP '2021-01-01 09:30:00', TIMESTAMP '2021-01-01 17:30:00');
+
+INSERT INTO SHIFT_ROOMS VALUES(5000,3000);
+INSERT INTO SHIFT_ROOMS VALUES(5001,3007);
+INSERT INTO SHIFT_ROOMS VALUES(5002,3009);
+INSERT INTO SHIFT_ROOMS VALUES(5003,3009);
+INSERT INTO SHIFT_ROOMS VALUES(5004,3008);
+INSERT INTO SHIFT_ROOMS VALUES(5005,3010);
+INSERT INTO SHIFT_ROOMS VALUES(5006,3002);
+INSERT INTO SHIFT_ROOMS VALUES(5007,3007);
+INSERT INTO SHIFT_ROOMS VALUES(5008,3007);
+INSERT INTO SHIFT_ROOMS VALUES(5009,3007);
+INSERT INTO SHIFT_ROOMS VALUES(5010,3007);
+INSERT INTO SHIFT_ROOMS VALUES(5011,3007);
+INSERT INTO SHIFT_ROOMS VALUES(5012,3007);
+
+INSERT INTO PATIENT VALUES(6000, 'ERIC CLAPTON', 'MALE', DATE '1945-01-21', '1001 HURTWOOD EDGE,UK', '4410012334', 'CONTACT@ERICCLAPTON.COM');
+INSERT INTO PATIENT VALUES(6001, 'JOHN MAYER', 'MALE', DATE '1977-02-10', '3784 BEVERLY HILLS,CA 90212,UNITED STATES', '6679876756', 'CONTACT@JOHNMAYER.COM');
+INSERT INTO PATIENT VALUES(6002, 'JOE SATRIANI','MALE', DATE '1956-11-23', '3767 WASHINGTON STREET,SAN FRANCISCO,CA 94118', '8770987890', 'CONTACT@JOESATRIANI.COM');
+INSERT INTO PATIENT VALUES(6003, 'ERIC JOHNSON', 'MALE', DATE '1954-10-12', '913 MCALEER CT BALTIMORE,MD 21202', '5567788990', 'CONTACT@JOESATRIANI.COM');
+INSERT INTO PATIENT VALUES(6004, 'TIA SIMPSON', 'FEMALE', DATE '1992-02-22', '1120 CEDAR GARDEN,BALTIMORE,MD', '4416612334', 'CONTACT@TIASIMPSON.COM');
+INSERT INTO PATIENT VALUES(6005, 'ERICA JHONAS', 'FEMALE', DATE '1994-12-13', '231 EAGLE AVE,AUSTIN,TX', '4569012334', 'CONTACT@ERICAJHONAS.COM');
+
+INSERT INTO ADMISSION VALUES(7000,6000,01,1000,DATE '2021-01-01',DATE '2021-01-01','FEVER','ALLERGIC TO PARACETAMOL', 1);
+INSERT INTO ADMISSION VALUES(7001,6001,03,1001,DATE '2021-02-10', DATE '2021-02-20', 'CANCER',NULL, 2);
+INSERT INTO ADMISSION VALUES(7002,6002,05,1003,DATE '2021-03-01', DATE '2021-03-15', 'COVID19',NULL, 3);
+INSERT INTO ADMISSION VALUES(7003,6003,05,1004,DATE '2021-04-04', DATE '2021-04-10', 'FLU',NULL, 1);
+INSERT INTO ADMISSION VALUES(7004,6004,04,1002,DATE '2021-05-10', DATE '2021-05-11', 'MALARIA',NULL, 2);
+INSERT INTO ADMISSION VALUES(7005,6002,05,1003,DATE '2021-05-11', DATE '2021-05-11', 'DENGUE',NULL, 3);
+
+INSERT INTO ADMIT_ROOM VALUES(7000,01,3000,TIMESTAMP '2021-01-01 10:00:00',TIMESTAMP '2021-01-01 04:00:00');
+INSERT INTO ADMIT_ROOM VALUES(7001,03,3007,TIMESTAMP '2021-02-10 10:00:00',TIMESTAMP '2021-02-21 04:00:00');
+INSERT INTO ADMIT_ROOM VALUES(7002,05,3009,TIMESTAMP '2021-03-01 10:00:00',TIMESTAMP '2021-04-01 05:00:00');
+INSERT INTO ADMIT_ROOM VALUES(7003,05,3001,TIMESTAMP '2021-04-04 10:00:00',TIMESTAMP '2021-04-14 07:00:00');
+INSERT INTO ADMIT_ROOM VALUES(7004,04,3008,TIMESTAMP '2021-05-11 02:00:00',TIMESTAMP '2021-05-11 08:00:00');
+INSERT INTO ADMIT_ROOM VALUES(7005,05,3010,TIMESTAMP '2021-05-11 02:00:00',TIMESTAMP '2021-05-11 08:00:00');
+
+INSERT INTO PATIENT_TREATMENTDETAILS VALUES (4000,7000,DATE '2021-01-01');
+INSERT INTO PATIENT_TREATMENTDETAILS VALUES (4001,7001,DATE '2021-02-10');
+INSERT INTO PATIENT_TREATMENTDETAILS VALUES (4002,7002,DATE '2021-03-01');
+INSERT INTO PATIENT_TREATMENTDETAILS VALUES (4003,7003,DATE '2021-04-04');
+INSERT INTO PATIENT_TREATMENTDETAILS VALUES (4001,7004,DATE '2021-05-11');
+
+INSERT INTO M_DRUG VALUES(8000,'ATORVASTATIN','250MG',2); 
+INSERT INTO M_DRUG VALUES(8001,'LEVOTHYROXINE','10MG',1); 
+INSERT INTO M_DRUG VALUES(8002,'LISINOPRIL','500MG',2); 
+INSERT INTO M_DRUG VALUES(8003,'METFORMIN','100MG',3); 
+INSERT INTO M_DRUG VALUES(8004,'METOPROLOL','250MG',2); 
+
+INSERT INTO ALLERGY VALUES (6001,8001);
+INSERT INTO ALLERGY VALUES (6002,8002);
+INSERT INTO ALLERGY VALUES (6003,8003);
+INSERT INTO ALLERGY VALUES (6004,8003);
+INSERT INTO ALLERGY VALUES (6004,8004);
+
+INSERT INTO PRESCRIPTION VALUES(9000, 8002, 7000, TIMESTAMP '2021-01-01 18:00:00', 3, 0);
+INSERT INTO PRESCRIPTION VALUES(9001, 8003, 7001, TIMESTAMP '2021-02-10 16:00:00', 3, 0);
+INSERT INTO PRESCRIPTION VALUES(9002, 8002, 7002, TIMESTAMP '2021-03-01 08:00:00', 3, 0);
+INSERT INTO PRESCRIPTION VALUES(9003, 8003, 7003, TIMESTAMP '2021-04-04 08:00:00', 3, 0);
+INSERT INTO PRESCRIPTION VALUES(9004, 8002, 7004, TIMESTAMP '2021-05-11 18:00:00', 3, 0);
+
+INSERT INTO MESSAGE VALUES(1, 1000, 6001, TIMESTAMP '2021-01-11 10:00:00', 'NORMAL FEVER');
+INSERT INTO MESSAGE VALUES(2, 1001, 6002, TIMESTAMP '2021-02-10 10:00:00', 'INITIAL LEVEL OF CANCER. CAN BE EFFECTIVELY TREATED WITH REGULAR MEDICATION');
+INSERT INTO MESSAGE VALUES(3, 1003, 6003, TIMESTAMP '2021-03-01 10:30:00', 'ASYMPTOMATIC COVID. NEED TO BE QUARANTINED AND PRESCRIBED MEDICATION TO BE USED FOR 2 WEEKS');
+INSERT INTO MESSAGE VALUES(4, 1004, 6004, TIMESTAMP '2021-04-04 10:00:00', 'FLU SYMPTOMS ARE SHOWN');
+INSERT INTO MESSAGE VALUES(5, 1002, 6002, TIMESTAMP '2021-05-10 10:00:00', 'NO OTHER HEALTH ISSUES');
+INSERT INTO MESSAGE VALUES(6, 1003, 6002, TIMESTAMP '2021-05-11 15:00:00', 'PRESCRIBED MEDICATION IS SUFFICIENT');
+INSERT INTO MESSAGE VALUES(7, 1003, 6002, TIMESTAMP '2021-01-11 16:00:00', 'NO OTHER ISSUES EXCEPT FOR HIGH BODY TEMPERATURE');
+INSERT INTO MESSAGE VALUES(8, 1003, 6002, TIMESTAMP '2010-01-11 16:30:00', 'MEDIUM COMPLEXITY. MORE CHECKUPS AND TESTS ARE REQUIRED');
+INSERT INTO MESSAGE VALUES(9, 1003, 6002, TIMESTAMP '2010-01-11 17:00:00', 'SEVERITY LEVEL CAN BE BROUGHT DOWN TO NORMAL WITH REGULAR TREATMENT');
+INSERT INTO MESSAGE VALUES(10, 1003, 6002, TIMESTAMP '2010-01-11 16:00:00', 'OBSERVATION IS NEEDED EVERY 1 WEEK');
+INSERT INTO MESSAGE VALUES(11, 1004, 6003, TIMESTAMP '2010-01-11 15:30:00', 'OBSERVATION IS NEEDED EVERY 1 WEEK');
+INSERT INTO MESSAGE VALUES(12, 1003, 6002, TIMESTAMP '2010-01-11 17:30:00', 'OBSERVATION IS NEEDED EVERY 1 WEEK');
+
+---****Feature 1****
+--Add sequence so that patient can be easily inserted without worrying about its PID
+CREATE SEQUENCE patient_id_seq
+  START WITH 2012
+  INCREMENT BY 1
+  CACHE 20;
+--To Add a sequence before inserting data
+--TO BE EXECUTED SEPARATELY AND ONLY ONCE
+create trigger patient_seq_trigger
+before insert on patient
+for each row
+   begin
+     select patient_id_seq.nextval into :new.PID from dual;
+   end;
+desc patient;
+--1. Validation
+--Feature 1.
+/*
+    Here is an example for feature 1: add a patient
+    Input: name of patient, gender, date of birth, address, phone and email.
+    Output: screen output of 'the patient already exists' 
+    if a patient with the same name and date of birth exists and update of address, phone and email. 
+    Otherwise a new row inserted into patient table and a screen output of the newly assigned patient ID.
+    Example of calling the feature: exec add_patient('Nanthy', 2, date '2000-6-10', '1456 North Street, Baltimore, MD', '4102222231','nanthy@gmail.com');
+*/
+set SERVEROUT ON;
+DECLARE
+patient number;
+--This function will validate the patient name, if patient name and DOB matches, it will return the PID if found else, PID will be returned null;
+FUNCTION VALIDATE_PATIENT(patientName IN VARCHAR2 , dob IN Date) return number
+    is patientID number;
+    BEGIN
+        BEGIN 
+            SELECT pid into patientID from PATIENT where pname = patientName and DOB = dob;
+        EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                patientID := NULL;
+        END;
+    return patientID;
+END;
+-- function to update patient record
+FUNCTION updatePatient(patientID IN number, g IN varchar2, add IN varchar2, ph IN char, emailID IN varchar2) return number 
+is 
+updateSuccess number;
+    BEGIN
+        UPDATE Patient  SET  GENDER = g, ADDRESS=add, PHONE=ph, EMAIL=emailID where pid = patientID;    
+    updateSuccess := SQL%rowcount; 
+    COMMIT;
+    if updateSuccess =1 then
+        return patientID; 
+    else 
+        return null;
+    end if;
+    END;
+--Function to insert a patient record
+FUNCTION insertPatient (patientName IN varchar2, gender IN varchar2, dob IN date, address IN varchar2, phone IN CHAR, email IN varchar2) RETURN number
+IS patientID number;
+BEGIN
+INSERT INTO PATIENT (PNAME, GENDER, DOB, ADDRESS, PHONE, EMAIL) 
+VALUES (patientName, gender, dob, address, phone, email)returning pid into patientID; 
+COMMIT;
+return patientID;
+END;
+--This function will add or update the patient based on validation
+FUNCTION add_patient(patientName IN varchar2, gender IN varchar2, dob IN date, address IN varchar2, phone IN CHAR, email IN varchar2) RETURN number 
+is patientID number;
+BEGIN
+    --Validate Patient
+    patientID:= VALIDATE_PATIENT(patientName, dob); 
+    IF patientID is NOT NULL then 
+        DBMS_OUTPUT.PUT_LINE ('patient already exists with patient id ' || patientid || ' Updating the patient...');
+        patientID := updatePatient(patientID, gender, address, phone, email);
+        IF patientID is not null then
+            DBMS_OUTPUT.PUT_LINE ('patient updated ');
+        ELSE 
+            DBMS_OUTPUT.PUT_LINE ('Some error occured while updating');
+        END IF;
+    ELSE
+        patientID := insertPatient(patientName, gender, dob, address, phone, email);
+        IF patientID is not null then
+            DBMS_OUTPUT.PUT_LINE ('patient created with patient id ' || patientid);
+        ELSE 
+            DBMS_OUTPUT.PUT_LINE ('Some error occured while inserting');
+        END IF;
+    END IF;
+    return patientID;
+END;
+BEGIN  
+--adding a new patient 
+patient := add_patient('Jasleen Royale', 'FEMALE', date '1999-02-10', '1456 North Street, Baltimore, MD', '4102222211','royal_jasleen@gmail.com');
+-- updating an exsisting patient
+patient := add_patient('JOHN MAYER', 'MALE', date '1977-02-10', '1245 Preston Ct, NH', '3311678945','contact_john@johnmayer.com');
+END;
+
+exec add_patient('ERIC CLAPTON', 'MALE', DATE '1945-01-21', '1001 Hurtwood Edge, UK', '4410012334', 'contact@ericclapton.com'); 
+
+---***Feature 2****
+SET SERVEROUT ON;
+--Function to validate a patient and return patient id if found
+CREATE OR REPLACE FUNCTION validate_patient (
+    patientname IN VARCHAR2,
+    dob         IN DATE
+) RETURN NUMBER IS
+    patientid NUMBER;
+BEGIN
+    BEGIN
+        SELECT
+            pid
+        INTO patientid
+        FROM
+            patient
+        WHERE
+                pname = patientname
+            AND dob = dob;
+    EXCEPTION
+        WHEN no_data_found THEN
+            patientid := NULL;
+    END;
+    RETURN patientid;
+END;
+--Function to validate Hospital id and return hospital Name if founds
+CREATE OR REPLACE FUNCTION validate_hospital (
+    hospital_id IN NUMBER
+) RETURN VARCHAR2 IS
+    hospitalname VARCHAR2(50);
+BEGIN
+    BEGIN
+        SELECT
+            name
+        INTO hospitalname
+        FROM
+            m_hospital
+        WHERE
+            hid = hospital_id;
+    EXCEPTION
+        WHEN no_data_found THEN
+            hospitalname := NULL;
+    END;
+    RETURN hospitalname;
+END;   
+-- Function to validate the doctor and if he is associate with the hospital, returns doctor's name if found    
+CREATE OR REPLACE FUNCTION validate_doctor_hospital (
+        hospital_id IN NUMBER,
+        doctor_id   IN NUMBER
+    ) RETURN VARCHAR2 IS
+        doctorname VARCHAR2(50);
+    BEGIN
+        BEGIN
+            SELECT
+                d.name
+            INTO doctorname
+            FROM
+                doctor_hospital dh,
+                m_doctor        d
+            WHERE
+                    d.did = dh.did
+                AND dh.hid = hospital_id
+                AND dh.did = doctor_id;
+        EXCEPTION
+            WHEN no_data_found THEN
+                doctorname := NULL;
+        END;
+        RETURN doctorname;
+    END;
+--Head/Main procedure where  a patient can get addmitted into the hospital (feature 2) is implemented    
+CREATE OR REPLACE PROCEDURE feature2 (
+    patientname      IN VARCHAR2,
+    dob              IN DATE,
+    hospital_id      IN NUMBER,
+    doctor_id        IN NUMBER,
+    reason_for_admit IN VARCHAR2
+) AS
+    patientid    NUMBER;
+    hospitalname VARCHAR2(50);
+    doctorname   VARCHAR2(50);
+    doctorid     NUMBER;
+BEGIN
+    patientid := validate_patient(patientname, dob);
+    IF patientid IS NULL THEN
+        dbms_output.put_line('patient not found ');
+    ELSE
+        hospitalname := validate_hospital(hospital_id);
+        IF hospitalname IS NULL THEN
+            dbms_output.put_line('hospital not found');
+        ELSE
+            doctorname := validate_doctor_hospital(hospital_id, doctor_id);
+            IF doctorname IS NULL THEN
+                dbms_output.put_line('doctor either not found or not affialated with the hospital');
+            ELSE
+                INSERT INTO admission (
+                    aid,
+                    pid,
+                    hid,
+                    did,
+                    admit_date,
+                    discharge_date,
+                    reason,
+                    notes,
+                    status
+                ) VALUES (
+                    admission_seq.nextval,
+                    patientid,
+                    hospital_id,
+                    doctor_id,
+                    sysdate,
+                    NULL,
+                    reason_for_admit,
+                    NULL,
+                    '1'
+                );
+                INSERT INTO message (
+                    mid,
+                    pid,
+                    message_time,
+                    message
+                ) VALUES (
+                    mes_Seq.nextval,
+                    patientid,
+                    systimestamp,
+                    'Dr. '
+                    || doctorname
+                    || ': Patient '
+                    || patientname
+                    || ' has been admitted into hospital '
+                    || hospitalname
+                );
+            END IF;
+        END IF;
+    END IF;
+END; 
+BEGIN
+  --Admitting invalid Patient
+feature2('JOHN MAYER1', DATE '1977-02-10', 11, 11, 'Fever');
+--Admitting invalid hospital ID
+feature2('JOHN MAYER', DATE '1977-02-10', 11, 11, 'Fever');
+--Admitting invalid doctor ID
+feature2('JOHN MAYER', DATE '1977-02-10', 1, 11, 'Fever');
+--Admitting valid record
+feature2('JOHN MAYER', DATE '1977-02-10', 1, 101, 'Fever');
+--
+END;
+
+---***Feature 3****
+
+/* 
+Here we are doing the following: 
+Assigning a room to a patient for a given admission.
+
+-Checking whether the admission ID is valid, if not printing an error message and stop.
+-Checking in the hospital the admission belongs to, whether there is a room with the input type that is not assigned for a time that overlaps with the start and end time. 
+-If there is at least one such room, then printing out the room ID and location, and assigning the first available room to the admission, and inserting a message to the message table with doctor ID and patient ID as the corresponding doctor ID and patient ID for that admission, and the message body saying 'Room X has been assigned to Patient Y from Z to W', where X is room's location, Y is name of patient, Z is start time and W is expected end time. 
+-Updating status of the admission to room assigned. 
+-If there is no room available, printing out a message no rooms are available.
+
+*/
+
+-- creating sequence--
+
+drop SEQUENCE msg_sequence;
+/
+create sequence msg_sequence;
+
+-- creating procedure --
+
+drop procedure assign_room;
+create or replace procedure assign_room(admission_id in integer, starttime in timestamp, endtime in timestamp, rtype in varchar)
+IS
+a_count integer;
+room_id integer;
+place varchar(30);
+patient_id integer;
+doctor_id integer;
+hospital_id integer;
+begin
+
+-- task 1 : -Checking whether the admission ID is valid, if not printing an error message and stop. -- 
+
+select count(*) into a_count from admission where aid=admission_id;
+if a_count=0 then
+dbms_output.put_line('Invalid Admission id');
+else
+
+-- task 2: -Checking in the hospital the admission belongs to, whether there is a room with the input type that is not assigned for a time that overlaps with the start and end time. 
+ --
+ 
+   select hid into hospital_id from admission where aid=admission_id;
+   select min(rid) into room_id from room where hid=hospital_id and rid not in (select rid from admit_room where hid=hospital_id and ROOM_STARTDATE <= endtime and ROOM_ENDDATE >= starttime) and rtype=roomtype;
+   
+   
+--task 3: If there is at least one such room, then printing out the room ID and location, and assigning the first available room to the admission, and inserting a message to the message table with doctor ID and patient ID as the corresponding doctor ID and patient ID for that admission, and the message body saying 'Room X has been assigned to Patient Y from Z to W', where X is room's location, Y is name of patient, Z is start time and W is expected end time. 
+--
+    if room_id is not null then
+    select location into place from room where rid=room_id;
+    dbms_output.put_line('Room with Id '||room_id||' is available and the location is '||place);
+    insert into admit_room values( admission_id, hospital_id, room_id, starttime, endtime);  
+    select pid, did into patient_id, doctor_id from admission where aid=admission_id;
+    insert into message values(msg_sequence.nextval,doctor_id, patient_id, systimestamp,'Room '||room_id||' has been assigned to '||patient_id||' from '||starttime|| ' to ' ||endtime);
+
+-- task 4 : -Updating status of the admission to room assigned. --
+
+update admission set status=2 where aid=admission_id;
+    else
+    
+    -- task 5 : -If there is no room available, printing out a message no rooms are available. -- 
+
+    dbms_output.put_line('No rooms available');
+    end if;
+end if;
+end;
+
+
+exec(
+
+
+
+
+--****Feature 6****
+
+SET SERVEROUTPUT ON;
+
+drop SEQUENCE msg_sequence;
+drop SEQUENCE presc_sequence;
+/
+create sequence msg_sequence;
+create sequence presc_sequence;
+drop procedure prescribe_drug;
+CREATE OR REPLACE PROCEDURE  prescribe_drug(drug_id in number, admission_id in number, 
+date_of_presc in date, no_of_days_take_drug in number, no_of_refills in number)
+as
+count_drug_id number;
+count_admission_id number;
+pat_name varchar(30);
+drug_name varchar(30);
+pat_id number;
+message varchar(120);
+doc_id number;
+v1 number;
+cursor C1 is select p.PID from patient p, admission a where p.PID= a.PID and a.AID= admission_id;
+begin
+select count(*) into count_drug_id from m_drug where DRID =drug_id;
+if count_drug_id = 0 then 
+dbms_output.put_line('Invalid Drug ID');
+else
+select count(*) into count_admission_id from admission where AID=admission_id;
+if count_admission_id = 0 then 
+dbms_output.put_line('Invalid admission ID');
+else
+select count(*) into v1 from allergy al, admission a where al.pid=a.pid and al.drid=drug_id and a.aid=admission_id;
+if v1 <> 0 then
+select pname, dname, a.did into pat_name, drug_name, doc_id from patient p , admission a, allergy al, m_drug d
+where p.pid = a.pid and p.pid = al.pid and al.drid = d.drid and al.drid = drug_id and a.aid=admission_id;
+dbms_output.put_line('Patient '|| pat_name || ' is allergic to ' || drug_name || ' , choose another drug');
+else 
+open c1;
+loop
+fetch c1 into pat_id;
+exit when c1%NOTFOUND;
+insert into prescription values(presc_sequence.nextval, drug_id, admission_id, pat_id, date_of_presc, no_of_days_take_drug, no_of_refills);
+end loop;
+close c1;
+mes := 'A new prescription of ' || drug_name || ' is created';
+select did into doc_id from admission where aid = admission_id;
+insert into message values(msg_sequence.nextval, doc_id, pat_id, message, systimestamp);
+end if;
+end if;
+end if;
+end;
+/
+set serveroutput on;
+
+--***Feature 4***
+set SERVEROUTPUT ON
+Create or replace procedure insert_treatment(Admission_id int ,treatment_id int ,treatment_Date date)
+IS
+r_count int;
+Treatmentid int;
+Patient_ID int;
+Patient_Name varchar(50);
+Doctor_ID int;
+Msg_ID int;
+T_Description varchar(200);
+TDate date;
+Messagebody varchar(200);
+BEGIN 
+ select count(*) into r_count from Treatment T where  T.TID=treatment_id;
+  if r_count = 0 then 
+  dbms_output.put_line('Invalid Treatment ID');
+ else
+   select count(*) into r_count from ADMISSION A where  A.AID=Admission_id;
+   if r_count = 0 then 
+      dbms_output.put_line('Invalid Admission ID');
+    else
+     Select max(PTID) into Treatmentid from patient_treatmentdetails;
+     if Treatmentid is null then
+      Treatmentid := 0;
+     end if;
+     insert into patient_treatmentdetails values(Treatmentid+1,treatment_id,treatment_Date,Admission_id);
+     select A.pid,A.DID,P.PNAME,T.description,PT.TREATMENT_DATE into Patient_ID,Doctor_ID, Patient_Name,T_Description,TDate 
+     from Admission A,Patient  P,Treatment T, PATIENT_TREATMENTDETAILS PT
+     where PT.TID=T.TID AND PT.AID=A.AID AND A.PID=P.PID AND pt.PTID=Treatmentid+1;
+     Messagebody := 'Patient '|| Patient_Name|| ' received treatment - '|| T_Description||' on '|| TDate;
+      Select MAX(MID) into Msg_ID from Message;
+      if Msg_ID is null then
+       Msg_ID := 0;
+      end if;
+      INSERT INTO MESSAGE VALUES(Msg_ID + 1,Doctor_ID,Patient_ID,CURRENT_TIMESTAMP,Messagebody);
+   end if;
+   end if;
+end;
+
+exec insert_treatment(1,1,date '2021-01-25');
+
+---****Feature 5***
+Create or replace type ListOfDrugs as varray(50) of varchar(500);
+
+create or replace procedure insert_PatientDrugAllergy (PatientID int , List_of_Drugs1 ListOfDrugs)
+AS
+r_count int;
+drug_count int; 
+d_id int;
+drug_Name varchar(50);
+Allergy_ID int;
+BEGIN 
+ select count(*) into r_count from Patient P where  P.PID = PatientID;
+  if r_count = 0 then 
+   dbms_output.put_line('Invalid patient id');
+ else
+   for i in 1..List_of_Drugs1.count loop
+   d_id := TO_NUMBER(List_of_Drugs1(i));
+   select count(*) into drug_count from M_drug M where  M.DRID = d_id;
+   if drug_count = 0 then
+    dbms_output.put_line(i||' is Invalid drug ID ');
+    else
+     Select count(*) into r_count from Allergy A where A.PID=PatientID and A.DRID = d_id;
+     if r_count = 0 then
+      Select max(ALID) into Allergy_ID from Allergy;
+      if Allergy_ID is null then
+       Allergy_ID := 0;
+       end if;
+       insert into Allergy values(Allergy_ID+1,PatientID,d_id);
+       Select DNAME into drug_Name from M_DRUG where DRID=TO_NUMBER(i);
+       dbms_output.put_line('Allergy to drug '||drug_Name||' is recorded');
+     elsif r_count > 0 then
+       dbms_output.put_line('already inserted');
+   end if;
+   end if;
+  end loop; 
+   end if;
+end;
+/
+
+exec insert_PatientDrugAllergy(2003,ListOfDrugs('4','5','7'));
+
+---***Feature 6****
+drop SEQUENCE msg_sequence;
+drop SEQUENCE presc_sequence;
+/
+create sequence msg_sequence;
+create sequence presc_sequence;
+drop procedure prescribe_drug;
+CREATE OR REPLACE PROCEDURE  prescribe_drug(drug_id in number, admission_id in number, 
+date_of_presc in date, no_of_days_take_drug in number, no_of_refills in number)
+as
+count_drug_id number;
+count_admission_id number;
+pat_name varchar(30);
+drug_name varchar(30);
+pat_id number;
+message varchar(120);
+doc_id number;
+v1 number;
+cursor C1 is select p.PID from patient p, admission a where p.PID= a.PID and a.AID= admission_id;
+begin
+select count(*) into count_drug_id from m_drug where DRID =drug_id;
+if count_drug_id = 0 then 
+dbms_output.put_line('Invalid Drug ID');
+else
+select count(*) into count_admission_id from admission where AID=admission_id;
+if count_admission_id = 0 then 
+dbms_output.put_line('Invalid admission ID');
+else
+select count(*) into v1 from allergy al, admission a where al.pid=a.pid and al.drid=drug_id and a.aid=admission_id;
+if v1 <> 0 then
+select pname, dname, a.did into pat_name, drug_name, doc_id from patient p , admission a, allergy al, m_drug d
+where p.pid = a.pid and p.pid = al.pid and al.drid = d.drid and al.drid = drug_id and a.aid=admission_id;
+dbms_output.put_line('Patient '|| pat_name || ' is allergic to ' || drug_name || ' , choose another drug');
+else 
+open c1;
+loop
+fetch c1 into pat_id;
+exit when c1%NOTFOUND;
+insert into prescription values(presc_sequence.nextval, drug_id, admission_id, pat_id, date_of_presc, no_of_days_take_drug, no_of_refills);
+end loop;
+close c1;
+mes := 'A new prescription of ' || drug_name || ' is created';
+select did into doc_id from admission where aid = admission_id;
+insert into message values(msg_sequence.nextval, doc_id, pat_id, message, systimestamp);
+end if;
+end if;
+end if;
+end;
+/
+set serveroutput on;
+
+--***Feature 7***
+CREATE OR REPLACE PROCEDURE feature7 (
+    v_nurse_id  IN  NUMBER,
+    input_time  IN  DATE
+) AS
+    temp NUMBER;
+BEGIN
+    BEGIN
+        SELECT
+            nid
+        INTO temp
+        FROM
+            m_nurse
+        WHERE
+            nid = v_nurse_id;
+    EXCEPTION
+        WHEN no_data_found THEN
+            dbms_output.put_line('Nurse ID is incorrect');
+    END;
+    IF temp IS NOT NULL THEN
+        BEGIN
+            SELECT
+                nid
+            INTO temp
+            FROM
+                shift
+            WHERE
+                    nid = v_nurse_id
+                AND input_time BETWEEN start_time AND end_time;
+            dbms_output.put_line('-------     ---------------       ----------------------');
+            dbms_output.put_line('Room ID     Location              Patient Name');
+            dbms_output.put_line('-------     ---------------       ----------------------');
+            FOR records IN (
+                SELECT
+                    r.rid         room_id,
+                    r.location    room_loc,
+                    p.pname       patient_name
+                FROM
+                    shift       s,
+                    room        r,
+                    admit_room  ar,
+                    admission   a,
+                    patient     p
+                WHERE
+                        s.rid = r.rid
+                    AND ar.rid = r.rid
+                    AND ar.aid = a.aid
+                    AND a.pid = p.pid
+                    AND ( input_time BETWEEN ar.room_startdate AND ar.room_enddate )
+                    AND s.nid = v_nurse_id
+                    AND ( input_time BETWEEN s.start_time AND s.end_time )
+            ) LOOP
+                dbms_output.put_line(records.room_id
+                                     || '           '
+                                     || records.room_loc
+                                     || '                '
+                                     || records.patient_name);
+            END LOOP;
+        EXCEPTION
+            WHEN no_data_found THEN
+                dbms_output.put_line('Nurse is not working at ' || input_time);
+        END;
+    END IF;
+END;
+--INSERT QUERY
+
+INSERT INTO ADMIT_ROOM (AID, RID, ROOM_STARTDATE, ROOM_ENDDATE) VALUES ('11', '101', TO_TIMESTAMP('2021-01-01 00:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'), TO_TIMESTAMP('2021-01-01 16:00:00.000000000', 'YYYY-MM-DD HH24:MI:SS.FF'))
+--Execution
+DECLARE
+  V_NURSE_ID NUMBER;
+  INPUT_TIME DATE;
+BEGIN
+  V_NURSE_ID := 1001;
+  INPUT_TIME := to_date('2021-01-01','yyyy-MM-dd');
+  FEATURE7(
+    V_NURSE_ID => V_NURSE_ID,
+    INPUT_TIME => INPUT_TIME
+  );
+--rollback; 
+END;
+
+--***Feature 8***
+CREATE OR REPLACE PROCEDURE feature8 (
+    v_admission_id    IN  NUMBER,
+    v_discharge_date  IN  DATE,
+    v_discharge_note  IN  VARCHAR2
+) AS
+    temp        NUMBER;
+    patient_id  NUMBER;
+    doctor_id   NUMBER;
+BEGIN
+    BEGIN
+        SELECT
+            aid,
+            pid,
+            did
+        INTO
+            temp,
+            patient_id,
+            doctor_id
+        FROM
+            admission
+        WHERE
+            aid = v_admission_id;
+    EXCEPTION
+        WHEN no_data_found THEN
+            dbms_output.put_line('Admission ID is incorrect');
+    END;
+    IF temp IS NOT NULL THEN
+        UPDATE admission
+        SET
+            discharge_date = v_discharge_date,
+            notes = v_discharge_note,
+            status = 3
+        WHERE
+            aid = v_admission_id;
+        --INSERT INTO MESSAGE (MID, DRID, PID, MESSAGE_TIME, MESSAGE) VALUES (MES_SEQ.nextval,doctor_id, patient_id, sysdate, 'Patient discharged on' || v_discharge_date);
+        dbms_output.put_line('--------------     ----------------------------------------');
+        dbms_output.put_line('Treatment Date     Description');
+        dbms_output.put_line('--------------     ----------------------------------------');
+        FOR records IN (
+            SELECT
+                pt.treatment_date    treatment_date,
+                tr.description       description
+            FROM
+                patient_treatmentdetails  pt,
+                treatment                 tr
+            WHERE
+                    pt.tid = tr.tid
+                AND pt.aid = v_admission_id
+        ) LOOP
+            dbms_output.put_line(records.treatment_date
+                                 || '           '
+                                 || records.description);
+        END LOOP;
+        dbms_output.put_line(' ');
+        dbms_output.put_line('--------------     ----------     ------------    --------------      ----------------');
+        dbms_output.put_line('Dose Name          Dose Value     Dose Per Day    Number of Days      Number of Refils');
+        dbms_output.put_line('--------------     ----------     ------------    --------------      ----------------');
+        FOR records IN (
+            SELECT
+                md.dname           dose_name,
+                md.dose_value      dose_value,
+                md.dose_per_day    dose_per_day,
+                p.no_of_days       no_of_days,
+                p.no_of_refills    no_of_refills
+            FROM
+                prescription  p,
+                m_drug        md
+            WHERE
+                    p.drid = md.drid
+                AND p.aid = v_admission_id
+        ) LOOP
+            dbms_output.put_line(records.dose_name
+                                 || '           '
+                                 || records.dose_value
+                                 || '               '
+                                 || records.dose_per_day
+                                 || '           '
+                                 || records.no_of_days
+                                 || '               '
+                                 || records.no_of_refills);
+        END LOOP;
+    END IF;
+END;
+
+
+DECLARE
+  V_ADMISSION_ID NUMBER;
+  V_DISCHARGE_DATE DATE;
+  V_DISCHARGE_NOTE VARCHAR2(200);
+BEGIN
+  V_ADMISSION_ID := 1;
+  V_DISCHARGE_DATE := to_date('2021-10-01','yyyy-MM-dd');
+  V_DISCHARGE_NOTE := 'Discharging';
+
+  FEATURE8(
+    V_ADMISSION_ID => V_ADMISSION_ID,
+    V_DISCHARGE_DATE => V_DISCHARGE_DATE,
+    V_DISCHARGE_NOTE => V_DISCHARGE_NOTE
+  );
+--rollback; 
+END;
+/
+
+--***Feature 9***
+create or replace procedure contact_tracing(Input_PName in varchar, BirthDate in date, P_AdmitDate date)
+as
+r_count integer;
+dr_Name varchar(25);
+StartTime timestamp;
+EndTime timestamp;
+N_Name varchar(25);
+cursor c1 is select  ar.room_startdate, ar.room_enddate , rid
+from admit_room ar, admission ad, patient pa
+where ad.aid=ar.aid and ad.pid=pa.pid and pa.dob=BirthDate and pa.pname=Input_PName and ad.ADMIT_DATE <= P_AdmitDate  and ad.DISCHARGE_DATE >=P_AdmitDate; 
+begin
+select count(*) into r_Count from patient where lower(pname)=lower(Input_PName) and dob=BirthDate;
+if r_Count=0 then
+dbms_output.put_line('No Matching Record Found With Given Details.');
+else
+    select count(*)into r_count 
+    from admission ad, patient pa 
+    where lower(pa.pname)=lower(Input_PName) and ad.pid=pa.pid and pa.dob=BirthDate and ad.ADMIT_DATE <= P_AdmitDate  and ad.DISCHARGE_DATE >=P_AdmitDate; 
+    if r_count=0 then
+    dbms_output.put_line('This patient is not in hospital that day');
+    else
+        select name into dr_Name 
+        from M_doctor d, admission ad, patient pa 
+        where lower(pa.pname)=lower(Input_PName) and ad.pid=pa.pid and ad.did=d.did and pa.dob=BirthDate and ad.ADMIT_DATE <= P_AdmitDate  and ad.DISCHARGE_DATE >=P_AdmitDate; 
+        dbms_output.put_line('The Patient '||Input_PName ||' was assigned to Doctor '||dr_Name);
+        dbms_output.new_line;
+        for item in c1 loop
+        dbms_output.put_line('The Patient '||Input_PName||' was admitted to room number: '||item.rid||' from '||item.room_startdate||' to '|| item.room_enddate);
+        end loop;
+        dbms_output.new_line;
+        for item in c1 loop
+        select name, sh.start_time, sh.end_time into N_Name, StartTime, EndTime 
+        from  M_nurse n,shift_rooms sr, shift sh
+        where sh.nid=n.nid and sh.rid= item.rid and sh.START_TIME <= item.room_enddate and sh.END_TIME >= item.room_startdate and sr.sid = sh.sid ;
+        dbms_output.put_line('The Nurse '||N_Name||' was assigned to room number: '||item.rid||' from '||StartTime||' to '||EndTime);
+        end loop;
+    end if;
+end if;
+exception when no_data_found then
+dbms_output.put_line('The Shift Details Of The Nurse Are Not Found');
+end; 
+/
+set SERVEROUTPUT ON;
+exec contact_tracing('ERIC CLAPTON',date '1945-01-21', date '2021-01-01');
+/
+exec contact_tracing('ERIC JOHNSON',date '1954-10-12', date '2021-04-04');
+ 
+--***Feature 10***
+
+create or replace procedure room_statistics1 ( Input_SDate in date, Input_EndDate in date, Input_HID in integer)
+as
+r_count  integer;
+TotalDays integer;
+Room_Start_Time timestamp;
+Room_End_Time timestamp;
+--no_of_admits integer;
+Room_ID integer;
+location varchar(20);
+R_Type varchar(20);
+Temp_SDate date;
+Rate_Of_Occupancy float;
+Counted_Days integer;
+cursor c1 is select r.rid from room r, admit_room ar where ar.rid=r.rid and r.hid=Input_HID;
+begin
+Temp_SDate:=Input_SDate;
+Counted_Days:= Input_EndDate - Input_SDate;
+TotalDays:=0;
+dbms_output.put_line(' Total Number Of Days = ' ||Counted_Days);
+select count(*) into r_count from M_hospital where hid=Input_HID;
+if r_count=0 then
+dbms_output.put_line('Invalid Hospital Id');
+else
+    select count(r.rid) into r_count from admit_room ar, room r where ar.rid=r.rid and r.hid=Input_HID;
+    if r_count=0 then
+    dbms_output.put_line('There are no assigned rooms for the hospital between: '||Input_SDate||' and '||Input_EndDate);
+    else
+    for r in c1 loop
+        while Temp_SDate <=Input_EndDate loop
+        Room_Start_Time:=to_timestamp(Temp_SDate);
+        Room_End_Time:=to_timestamp(Temp_SDate) + interval '0 23:59:00.00' day to second;
+        select count(*) into r_count from admit_room where  room_startdate<=Room_End_Time and room_enddate>=Room_Start_Time and rid=r.rid ;
+            if r_count > 0 then
+            TotalDays:=TotalDays + 1;
+            else
+                dbms_output.put_line('There are no admits on:  '||to_char(Temp_SDate, 'YYYY-MM-DD'));
+            end if;
+        Temp_SDate:=Temp_SDate + interval'1'day;
+        end loop;
+    select rid, location, roomtype into Room_ID, location, R_Type from room where rid=r.rid;
+    Rate_Of_Occupancy:=(TotalDays/Counted_Days)*100;
+        if Rate_Of_Occupancy <> 0 then
+            dbms_output.put_line('The occupancy rate of room '|| Room_ID|| ' of type '|| R_Type||' location ' || location||' is: '|| Rate_Of_Occupancy);
+        end if;
+   end loop;
+  end if;
+end if;
+exception when no_data_found then
+dbms_output.put_line('No records found');
+when others then
+dbms_output.put_line('start date should be less than end date');
+end;
+
+set serveroutput on;
+exec room_statistics1(date '2021-02-28',date '2021-05-13', 5);
+
+---***Feature 11****
+create or replace procedure shift_statistics(Input_HID in integer, Input_Sdate in date, Input_Enddate in date)
+as
+cursor C1 is select mn.name from M_nurse mn, shift sh  
+where hid=Input_HID and  trunc(start_time)<=Input_Enddate and trunc(end_time)>=Input_Sdate and sh.nid=mn.nid;
+shift_STime timestamp;
+shift_EndTime timestamp;
+no_of_hours integer;
+all_NurseAvg float;
+Total_Avg float;
+loop_start_date date;
+no_of_hrs integer;
+days_diff integer;
+avg_hours float;
+r_count integer;
+temp_start_time timestamp;
+temp_end_time timestamp;
+Nurse_Count integer;
+
+begin
+Nurse_Count:=0;
+no_of_hrs:=0;
+all_NurseAvg:=0;
+days_diff:=Input_Enddate-Input_Sdate; --- no of days
+Total_Avg:=0;
+no_of_hours:=0;
+--Check if the given Hospital ID is valid or not
+select count(*) into r_count from M_hospital where hid=Input_HID;
+if r_count=0 then
+dbms_output.put_line('Invalid Hospital ID');
+else
+
+		for item in C1 loop
+        avg_hours:=0;
+        no_of_hours:=0;
+        loop_start_date:=Input_Sdate;
+		while loop_start_date <=Input_Enddate loop
+			select count(*) into r_count from shift s, m_nurse n 
+            where n.nid=s.nid and name=item.name and trunc(start_time)=loop_start_date ;
+			if r_count=0 then
+			dbms_output.put('');
+			else
+			select start_time, end_time into shift_STime , shift_EndTime from shift sh, m_nurse mn 
+            where mn.nid=sh.nid and name=item.name and trunc(start_time)=loop_start_date ;
+			temp_start_time:=to_timestamp(loop_start_date) + interval '0 8:00:00.00' day to second;
+			temp_end_time:=to_timestamp(Input_Enddate) + interval '0 8:00:00.00' day to second;
+
+			if shift_STime< temp_start_time then
+				if shift_EndTime >temp_end_time then
+					no_of_hrs:=extract(day from(temp_end_time - temp_start_time))*24 + extract(hour from (temp_end_time - temp_start_time)) + extract(minute from(temp_end_time - temp_start_time))/60;
+    				else
+					no_of_hrs:=extract(day from(shift_EndTime - temp_start_time))*24 + extract(hour from (shift_EndTime - temp_start_time)) + extract(minute from(shift_EndTime - temp_start_time))/60;
+                    end if;
+			else
+				if shift_EndTime >temp_end_time then
+					no_of_hrs:=extract(day from(temp_end_time - shift_STime))*24 + extract(hour from (temp_end_time - shift_STime)) + extract(minute from(temp_end_time - shift_STime))/60;
+                else
+					no_of_hrs:=extract(day from(shift_EndTime - shift_STime))*24 + extract(hour from (shift_EndTime - shift_STime)) + extract(minute from(shift_EndTime - shift_STime))/60;
+                end if;
+			end if; 
+            no_of_hours:=no_of_hours + no_of_hrs;
+        end if;
+		loop_start_date:=loop_start_date + interval '1' day;
+		end loop;
+        Nurse_Count:=Nurse_Count + 1;
+        avg_hours:=(no_of_hours)/days_diff;
+        Total_Avg:=total_avg + avg_hours;
+        all_NurseAvg:=total_avg/Nurse_Count;
+        dbms_output.put_line('The average working hours of nurse '||item.name||' is '||avg_hours||' hrs');
+		end loop;
+dbms_output.put_line('The Total average working hours of all the nurses =  '||all_NurseAvg||' hrs');
+end if;
+end;
+/
+
+set SERVEROUTPUT ON
+exec shift_statistics(1, date '2021-01-01', date '2021-05-11');
+/
+
+---***Feature 12****
+
+CREATE OR REPLACE PROCEDURE feature12 (
+    inte IN NUMBER
+) AS
+    hostpitalname          VARCHAR2(50);
+    hospitalid             VARCHAR2(12);
+    admitcountperhospital  NUMBER;
+    readmission_count      NUMBER;
+    CURSOR hospitalidlist IS
+    SELECT DISTINCT
+        hid
+    FROM
+        admission;
+BEGIN
+    dbms_output.put_line('Patient Name     Prev Discharge Date     Prev Discharge reason      Admit Date     Admit Reason');
+    dbms_output.put_line('------------     -------------------     ---------------------      ----------     ------------');
+    FOR hospitalid IN hospitalidlist LOOP
+        readmission_count := 0;
+        SELECT
+            h.name,
+            COUNT(*)
+        INTO
+            hostpitalname,
+            admitcountperhospital
+        FROM
+            admission   a,
+            m_hospital  h
+        WHERE
+                a.hid = h.hid
+            AND a.hid = hospitalid.hid
+        GROUP BY
+            h.name;
+        FOR records IN (
+            SELECT
+                pat.pname             p_name,
+                ad2.discharge_date    d_date,
+                ad2.reason            prev_reason,
+                ad1.admit_date        new_admit_date,
+                ad1.reason            new_reason
+            FROM
+                admission  ad1,
+                admission  ad2,
+                patient    pat
+            WHERE
+                    pat.pid = ad1.pid
+                AND ad1.pid = ad2.pid
+                AND ad1.admit_date > ad2.discharge_date
+                AND ( trunc(ad1.admit_date) - trunc(ad2.discharge_date) ) <= inte
+                AND ad1.hid = hospitalid.hid
+        ) LOOP
+            dbms_output.put_line(records.p_name
+                                 || '          '
+                                 || records.d_date
+                                 || '                 '
+                                 || records.prev_reason
+                                 || '          '
+                                 || records.new_admit_date
+                                 || '          '
+                                 || records.new_reason);
+
+            readmission_count := readmission_count + 1;
+        END LOOP;
+        dbms_output.put_line('Hospital '
+                             || hostpitalname
+                             || ' has '
+                             || round((readmission_count / admitcountperhospital), 2)
+                             || ' readmission rate');
+
+    END LOOP;
+END;
+
+exec feature12(150);
